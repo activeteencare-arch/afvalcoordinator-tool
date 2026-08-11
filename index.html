@@ -609,6 +609,25 @@ window.addEventListener('message', function(e) {
   renderVerwerkers();
 });
 
+/* v7: de coach kan ook rechtstreeks het plaatsoverzicht openen. */
+window.addEventListener('message', function(e) {
+  if (e.origin !== 'https://afval-coach-helper.lovable.app') return;
+  if (!e.data || e.data.type !== 'afval-coach-plaats') return;
+  const plaats = (e.data.plaats || '').toString().trim();
+  if (!plaats) return;
+  const zoek = document.getElementById('plaatsZoek');
+  const stroom = document.getElementById('plaatsStroom');
+  if (!zoek) return;
+  activateTab('plaats');
+  zoek.value = plaats;
+  if (e.data.streamId && DATA.streams.some(s => s.id === e.data.streamId)) {
+    stroom.value = e.data.streamId;
+  }
+  if (typeof vulPlaatsSuggesties2 === 'function') vulPlaatsSuggesties2(plaats);
+  if (typeof renderPlaats === 'function') renderPlaats();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
 function websiteLink(c) {
   if (!c.website || c.website === '') return '';
   let url = c.website.split(' ')[0].replace(/^https?:\/\//, '');
